@@ -1,16 +1,14 @@
 package com.example.konzy.tapguessinggame;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.TextView;
-
 import java.util.Random;
-
-// TODO: 3/18/2017 make alert for finished game
-// TODO: 3/18/2017 pretty up ppt
-// TODO: 3/18/2017 change onTouchEvent to onTapConfirmed or whatever
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,26 +21,41 @@ public class MainActivity extends AppCompatActivity {
     private int guesses;
 
     private TextView statusTextView;
+    private View view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main_activity);
 
         statusTextView = (TextView) findViewById(R.id.statusTextView);
+        view = findViewById(R.id.view);
 
         mRandom = new Random();
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-        y = metrics.heightPixels;
+
         x = metrics.widthPixels;
+        y = metrics.heightPixels;
+
 
         longestDistancePossible = distanceFormula(x, y);
 
         createSecretLocation();
 
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN){
+                    guesses++;
+                    double distance = distanceFormula(event.getX() - secretLocationX, event.getY() - secretLocationY);
+                    statusTextView.setText(getTemperature(distance) + " Guessed " + guesses + " times");
+                }
+                return true;
+            }
+        });
     }
 
     private double distanceFormula(double x, double y) {
@@ -51,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void createSecretLocation() {
         guesses = 0;
+        statusTextView.setText("");
         secretLocationX = mRandom.nextDouble() * x;
         secretLocationY = mRandom.nextDouble() * y;
     }
@@ -68,16 +82,26 @@ public class MainActivity extends AppCompatActivity {
         } else if (percentage > 0.1) {
             return "Hot";
         } else {
-            createSecretLocation();
-            return "You found it!";
+            Alert();
+            return "Found it, ";
         }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        guesses++;
-        double distance = distanceFormula(event.getX() - secretLocationX, event.getY() - secretLocationY);
-        statusTextView.setText(getTemperature(distance) + " Guessed " + guesses + " times");
-        return false;
+    private void Alert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("You found the location in " + guesses + " guesses!");
+        builder.setCancelable(true);
+
+        builder.setPositiveButton(
+                "Ok",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        createSecretLocation();
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 }

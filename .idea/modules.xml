@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AndroidTapGame.iml" filepath="$PROJECT_DIR$/AndroidTapGame.iml" />
       <module fileurl="file://$PROJECT_DIR$/TapGuessingGame.iml" filepath="$PROJECT_DIR$/TapGuessingGame.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
